@@ -1,3 +1,5 @@
+const functions = require("../timeFunctions");
+
 class Equipments {
     constructor(id, name, type, available) {
         this.id = id;
@@ -16,7 +18,9 @@ class Equipments {
      * @param durationMinutes le temps d'analyse nécessaire
      * @returns {string} retourne l'heure de départ la plus proche
      */
-    getNextAvailable(arrivalTime, durationMinutes) {
+    getNextAvailableTime(arrivalTime, durationMinutes) {
+        if(this.bookings.length === 0) return 0;
+
         let start = this.functions.parseTimeInMinute(arrivalTime);
 
         for (const b of this.bookings) {
@@ -31,6 +35,39 @@ class Equipments {
         }
 
         return this.functions.formatTime(start);
+    }
+
+    /**
+     * Permet de trouver un équipement disponible le plus tôt possible
+     * @param equipments tableau des équipements
+     * @param sampleType Type d'échantillon
+     * @param arrivalTime Heure d'arrivé de l'échantillon, format 'HH:MM'
+     * @param durationMinutes Durée de l'analyse en minute
+     * @returns {{equipment: Equipments, startTime: string}}
+     */
+    static getNextAvailableEquipment(equipments, sampleType, arrivalTime, durationMinutes) {
+        const functions = require('../timeFunctions.js');
+
+        let bestEquipment = null;
+        let bestAvailableTimeMinutes = 0;
+
+        for(let equipment of equipments) {
+            if(equipment.type !== sampleType) continue;
+
+            const nextAvailableTime = equipment.getNextAvailableTime(arrivalTime, durationMinutes);
+
+            const nextAvailableTimeMinutes = nextAvailableTime === 0 ? functions.parseTimeInMinute(arrivalTime) : functions.parseTimeInMinute(nextAvailableTime);
+
+            if(bestAvailableTimeMinutes < nextAvailableTimeMinutes) {
+                bestAvailableTimeMinutes = nextAvailableTimeMinutes;
+                bestEquipment = equipment;
+            }
+        }
+
+        return {
+            equipment: bestEquipment,
+            startTime: functions.formatTime(bestAvailableTimeMinutes)
+        };
     }
 }
 

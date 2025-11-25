@@ -1,27 +1,23 @@
 const { extractDataFromJson } = require('./functions.js');
 const { calculateEndTime, parseTimeInMinute, formatTime } = require('./timeFunctions.js');
 const Schedule = require('./models/Schedule');
+const Samples = require('./models/Samples');
+const Technicians = require('./models/Technicians');
+const Equipments = require('./models/Equipments');
 
-function run() {
-    let data = extractDataFromJson();
-    let samples = data.samples;
+function planifyLab(data){
+    const samples = Samples.sortSamplesByPriority(data.samples);
     const technicians = data.technicians;
     const equipments = data.equipments;
-    let startTime = '';
     let scheduleTab = [];
-
-    samples[0].sortSamplesByPriority(samples);
 
     for(const sample of samples) {
         const sampleType = sample.type;
         const sampleArrivalTime = sample.arrivalTime;
         const sampleDuration = sample.analysisTime;
 
-        const assignedTechnician = technicians.find(technician => technician.speciality === sampleType || technician.speciality === 'GENERAL');
-        const startTimeTechnician = assignedTechnician.getNextAvailable(sampleArrivalTime, sampleDuration);
-
-        const assignedEquipment = equipments.find(equipment => equipment.type === sampleType);
-        const startTimeEquipment = assignedEquipment.getNextAvailable(sampleArrivalTime, sampleDuration);
+        const { technician: assignedTechnician, startTime: startTimeTechnician } = Technicians.getNextAvailableTechnician(technicians, sampleType, sampleArrivalTime, sampleDuration);
+        const { equipment: assignedEquipment, startTime: startTimeEquipment } = Equipments.getNextAvailableEquipment(equipments, sampleType, sampleArrivalTime, sampleDuration);
 
         const startTime = startTimeTechnician > startTimeEquipment ? assignedTechnician : startTimeEquipment;
         const endTime = calculateEndTime(startTime, sampleDuration);
@@ -46,6 +42,12 @@ function run() {
         ));
     }
     console.log(scheduleTab);
+}
+
+function run() {
+    const data = extractDataFromJson();
+
+    planifyLab(data);
 }
 
 run();

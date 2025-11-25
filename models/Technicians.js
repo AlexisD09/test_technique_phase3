@@ -17,12 +17,14 @@ class Technicians {
      * @param durationMinutes le temps d'analyse nécessaire
      * @returns {string} retourne l'heure de départ la plus proche
      */
-    getNextAvailable(arrivalTime, durationMinutes) {
+    getNextAvailableTime(arrivalTime, durationMinutes) {
+        if(this.bookings.length === 0) return this.startTime;
+
         let start = this.functions.parseTimeInMinute(arrivalTime);
 
-        for (const b of this.bookings) {
-            const bookingStart = this.functions.parseTimeInMinute(b.startTime);
-            const bookingEnd = this.functions.parseTimeInMinute(b.endTime);
+        for (const booking of this.bookings) {
+            const bookingStart = this.functions.parseTimeInMinute(booking.startTime);
+            const bookingEnd = this.functions.parseTimeInMinute(booking.endTime);
 
             if (start + durationMinutes <= bookingStart) {
                 break;
@@ -32,6 +34,37 @@ class Technicians {
         }
 
         return this.functions.formatTime(start);
+    }
+
+    /**
+     * Permet de trouver un technicien disponible le plus tôt possible
+     * @param technicians tableau des techniciens
+     * @param sampleType Type d'échantillon
+     * @param arrivalTime Heure d'arrivé de l'échantillon, format 'HH:MM'
+     * @param durationMinutes Durée de l'analyse en minute
+     * @returns {{technician: Technicians, startTime: string}}
+     */
+    static getNextAvailableTechnician(technicians, sampleType, arrivalTime, durationMinutes) {
+        const functions = require('../timeFunctions.js');
+
+        let bestTechnician = null;
+        let bestAvailableTimeMinutes = 0;
+
+        for(let technician of technicians) {
+            if(technician.speciality !== sampleType && technician.speciality !== 'GENERAL') continue;
+
+            const nextAvailableTimeMinutes = functions.parseTimeInMinute(technician.getNextAvailableTime(arrivalTime, durationMinutes));
+
+            if(bestAvailableTimeMinutes < nextAvailableTimeMinutes) {
+                bestAvailableTimeMinutes = nextAvailableTimeMinutes;
+                bestTechnician = technician;
+            }
+        }
+
+        return {
+            technician: bestTechnician,
+            startTime: functions.formatTime(bestAvailableTimeMinutes)
+        };
     }
 }
 
