@@ -1,23 +1,34 @@
-const { extractDataFromJson, calculateEndTime } = require('./functions.js');
+const { extractDataFromJson } = require('./functions.js');
+const { calculateEndTime, parseTimeInMinute, formatTime } = require('./timeFunctions.js');
+const Schedule = require('./models/Schedule');
 
 function run() {
     let data = extractDataFromJson();
-    const samples = data.samples;
+    let samples = data.samples;
     const technicians = data.technicians;
     const equipments = data.equipments;
-    let schedule = [];
+    let startTime = '';
+    let scheduleTab = [];
+
+    // On trie en fonction des priorités
+    samples[0].sortSamplesByPriority(samples);
 
     for(let i = 0; i < samples.length; i++) {
         const sampleType = samples[i].type;
-        let assignedTechnician = 0;
-        let assignedEquipment = 0;
-        let endTime = 0;
+        const sampleArrivalTime = samples[i].arrivalTime;
+        const sampleDuration = samples[i].analysisTime;
+        let assignedTechnician;
+        let assignedEquipment;
+        let startTimeTechnician;
+        let startTimeEquipment;
 
         for (let j = 0; j < technicians.length; j++) {
             const speciality = technicians[j].speciality;
 
             if(speciality === sampleType) {
-                assignedTechnician = technicians[j].id;
+                assignedTechnician = technicians[j];
+                startTimeTechnician = assignedTechnician.getNextAvailable(sampleArrivalTime, sampleDuration);
+                break;
             }
         }
 
@@ -25,24 +36,38 @@ function run() {
             const equipmentType = equipments[j].type;
 
             if(equipmentType === sampleType) {
-                assignedEquipment = equipments[j].id;
+                assignedEquipment = equipments[j];
+                startTimeEquipment = assignedEquipment.getNextAvailable(sampleArrivalTime, sampleDuration);
+                break;
             }
         }
 
-        if(assignedTechnician !== 0 && assignedEquipment !== 0) {
-            endTime = calculateEndTime(samples[i].arrivalTime, samples[i].analysisTime);
-        }
+        const startTechMinutes = parseTimeInMinute(startTimeTechnician);
+        const startEquipMinutes = parseTimeInMinute(startTimeEquipment);
+        const startTimeMinutes = Math.max(startTechMinutes, startEquipMinutes);
+        const startTime = formatTime(startTimeMinutes);
+        const endTime = calculateEndTime(startTime, sampleDuration);
 
-        schedule.push({
-            sampleId: samples[i].id,
-            technicianId: assignedTechnician,
-            equipmentId: assignedEquipment,
-            startTime: samples[i].arrivalTime,
+        assignedTechnician.bookings.push({
+            startTime: startTime,
+            endTime: endTime,
+        });
+
+        assignedEquipment.bookings.push({
+            startTime: startTime,
             endTime: endTime,
         })
+
+        scheduleTab.push(new Schedule(
+            samples[i].id,
+            assignedTechnician.id,
+            assignedEquipment.id,
+            startTime,
+            endTime,
+            samples[i].priority,
+        ));
     }
-    
-    console.log(schedule);
+    console.log(scheduleTab);
 }
 
 run();
