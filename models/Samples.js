@@ -8,6 +8,10 @@ class Samples{
         this.patientId = patientId;
     }
 
+    /**
+     * Trie un tableau d'échantillons par ordre d'importance
+     * @param samples tableau trié
+     */
     sortSamplesByPriority(samples){
         const priorityOrder = {
             "STAT": 1,

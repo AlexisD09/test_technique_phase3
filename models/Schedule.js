@@ -1,5 +1,3 @@
-const {calculateEndTime} = require("../functions");
-
 class Schedule {
     constructor(sampleId, technicianId, equipmentId, startTime, endTime, priority){
         this.id = sampleId;

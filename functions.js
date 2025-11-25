@@ -4,6 +4,10 @@ const Samples = require('./models/Samples');
 const Technicians = require('./models/Technicians');
 const Equipments = require('./models/Equipments');
 
+/**
+ * Récupère le contenu du json et créer les objects
+ * @returns {{samples: Samples[], technicians: Technicians[], equipments: Equipments[]}}
+ */
 function extractDataFromJson() {
     const filePath = path.join(__dirname, 'datas', 'input.json');
     const datas = JSON.parse(fs.readFileSync(filePath, 'utf8'));

@@ -10,12 +10,13 @@ class Technicians {
         this.functions = require('../timeFunctions.js');
     }
 
-    isAvailable(startTime, endTime){
-        return !this.bookings.some(b => {
-            return !(endTime <= b.startTime || startTime >= b.endTime);
-        });
-    }
-
+    /**
+     * Vérifie dans le planning du technicien la prochaine disponibilité
+     * en fonction du temps nécessaire et de l'heure de d'arrivé de l'échantillon
+     * @param arrivalTime heure d'arrivé de l'échantillon
+     * @param durationMinutes le temps d'analyse nécessaire
+     * @returns {string} retourne l'heure de départ la plus proche
+     */
     getNextAvailable(arrivalTime, durationMinutes) {
         let start = this.functions.parseTimeInMinute(arrivalTime);
 
