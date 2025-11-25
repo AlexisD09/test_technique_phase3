@@ -1,10 +1,73 @@
 class Metrics {
-    constructor(totalTime, efficiency, conflicts){
-        this.totalTime = totalTime;
-        this.efficiency = efficiency;
-        this.conflicts = conflicts;
+    constructor(){
+        this.totalTime = 0;
+        this.efficiency = 0.0;
+        this.conflicts = 0;
+
+        this.functions = require('../timeFunctions.js');
     }
 
+    /**
+     * Initialise les calculs des métriques
+     * @param scheduleTab Tableau du planning
+     * @param samples Tableau des échantillons
+     */
+    generateMetrics(scheduleTab, samples){
+        this.calculateTotalTime(scheduleTab);
+        this.calculateEfficiency(scheduleTab, samples);
+    }
+
+    /**
+     * Calcul le temps qu'a pris le planning en minutes
+     * @param scheduleTab Tableau du planning
+     */
+    calculateTotalTime(scheduleTab) {
+        scheduleTab.map(schedule => {
+            schedule.endTime = this.functions.parseTimeInMinute(schedule.endTime);
+            schedule.startTime = this.functions.parseTimeInMinute(schedule.startTime);
+        })
+        const sortedEndTimeScheduleTab = [...scheduleTab].sort(
+            (a, b) => b.endTime - a.endTime
+        );
+
+        const sortedStartTimeScheduleTab = [...scheduleTab].sort(
+            (a, b) => a.startTime - b.startTime
+        );
+
+        const startOfScheduleMinutes = sortedStartTimeScheduleTab[0].startTime;
+        const endOfScheduleMinutes = sortedEndTimeScheduleTab[0].endTime;
+
+        this.totalTime = endOfScheduleMinutes - startOfScheduleMinutes;
+    }
+
+    /**
+     * Calcul l'éfficacité du planning
+     * @param scheduleTab Tableau du planning
+     * @param samples Tableau des échantillons
+     */
+    calculateEfficiency(scheduleTab, samples) {
+        let totalSamplesAnalysisTime = 0;
+
+        samples.map(sample => {
+            totalSamplesAnalysisTime += sample.analysisTime;
+        })
+
+        let efficiency = ((totalSamplesAnalysisTime/this.totalTime)*100).toFixed(1);
+
+        this.efficiency = efficiency >= 100 ? 100 : efficiency;
+    }
+
+    /**
+     * Retourne tous les métriques
+     * @returns {{totalTime: number, efficiency: number, conflicts: number}}
+     */
+    getMetrics(){
+        return {
+            "totalTime": this.totalTime,
+            "efficiency": this.efficiency,
+            "conflicts": this.conflicts
+        }
+    }
 }
 
 module.exports = Metrics;

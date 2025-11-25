@@ -18,7 +18,7 @@ class Technicians {
      * @returns {string} retourne l'heure de départ la plus proche
      */
     getNextAvailableTime(arrivalTime, durationMinutes) {
-        if(this.bookings.length === 0) return this.startTime;
+        if(this.bookings.length === 0) return arrivalTime;
 
         let start = this.functions.parseTimeInMinute(arrivalTime);
 
@@ -48,14 +48,14 @@ class Technicians {
         const functions = require('../timeFunctions.js');
 
         let bestTechnician = null;
-        let bestAvailableTimeMinutes = 0;
+        let bestAvailableTimeMinutes = Infinity;
 
         for(let technician of technicians) {
             if(technician.speciality !== sampleType && technician.speciality !== 'GENERAL') continue;
 
             const nextAvailableTimeMinutes = functions.parseTimeInMinute(technician.getNextAvailableTime(arrivalTime, durationMinutes));
 
-            if(bestAvailableTimeMinutes < nextAvailableTimeMinutes) {
+            if(bestAvailableTimeMinutes > nextAvailableTimeMinutes) {
                 bestAvailableTimeMinutes = nextAvailableTimeMinutes;
                 bestTechnician = technician;
             }

@@ -19,7 +19,7 @@ class Equipments {
      * @returns {string} retourne l'heure de départ la plus proche
      */
     getNextAvailableTime(arrivalTime, durationMinutes) {
-        if(this.bookings.length === 0) return 0;
+        if(this.bookings.length === 0) return arrivalTime;
 
         let start = this.functions.parseTimeInMinute(arrivalTime);
 
@@ -49,7 +49,7 @@ class Equipments {
         const functions = require('../timeFunctions.js');
 
         let bestEquipment = null;
-        let bestAvailableTimeMinutes = 0;
+        let bestAvailableTimeMinutes = Infinity;
 
         for(let equipment of equipments) {
             if(equipment.type !== sampleType) continue;
@@ -58,7 +58,7 @@ class Equipments {
 
             const nextAvailableTimeMinutes = nextAvailableTime === 0 ? functions.parseTimeInMinute(arrivalTime) : functions.parseTimeInMinute(nextAvailableTime);
 
-            if(bestAvailableTimeMinutes < nextAvailableTimeMinutes) {
+            if(bestAvailableTimeMinutes > nextAvailableTimeMinutes) {
                 bestAvailableTimeMinutes = nextAvailableTimeMinutes;
                 bestEquipment = equipment;
             }

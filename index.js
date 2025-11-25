@@ -4,7 +4,12 @@ const Schedule = require('./models/Schedule');
 const Samples = require('./models/Samples');
 const Technicians = require('./models/Technicians');
 const Equipments = require('./models/Equipments');
+const Metrics = require('./models/Metrics');
 
+/**
+ * Fonction qui organise les analyses de laboratoire médical et créer le planning des techniciens
+ * @param data {technicians: Technicians[], equipments: Equipments[], samples: Samples[]}
+ */
 function planifyLab(data){
     const samples = Samples.sortSamplesByPriority(data.samples);
     const technicians = data.technicians;
@@ -19,7 +24,7 @@ function planifyLab(data){
         const { technician: assignedTechnician, startTime: startTimeTechnician } = Technicians.getNextAvailableTechnician(technicians, sampleType, sampleArrivalTime, sampleDuration);
         const { equipment: assignedEquipment, startTime: startTimeEquipment } = Equipments.getNextAvailableEquipment(equipments, sampleType, sampleArrivalTime, sampleDuration);
 
-        const startTime = startTimeTechnician > startTimeEquipment ? assignedTechnician : startTimeEquipment;
+        const startTime = startTimeTechnician > startTimeEquipment ? startTimeTechnician : startTimeEquipment;
         const endTime = calculateEndTime(startTime, sampleDuration);
 
         assignedTechnician.bookings.push({
@@ -41,7 +46,14 @@ function planifyLab(data){
             sample.priority,
         ));
     }
-    console.log(scheduleTab);
+
+    const metrics = new Metrics();
+    let output = Schedule.formatSchedulesOutput(scheduleTab);
+
+    metrics.generateMetrics(scheduleTab, samples);
+    output.metrics = metrics.getMetrics();
+
+    console.log(output);
 }
 
 function run() {
