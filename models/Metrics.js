@@ -18,6 +18,29 @@ class Metrics {
     }
 
     /**
+     * Vérifie les potentiels conflits
+     * @param scheduleTab Tableau du planning
+     */
+    calculateConflicts(scheduleTab){
+        scheduleTabMinutes = scheduleTab.map(schedule => {
+            schedule.endTime = this.functions.parseTimeInMinute(schedule.endTime);
+            schedule.startTime = this.functions.parseTimeInMinute(schedule.startTime);
+        })
+
+        for(let schedule of scheduleTab){
+            for(let schedule2 of scheduleTab){
+                const overlap = schedule.startTime < schedule2.endTime && schedule2.startTime < schedule.endTime;
+                const techConflict = schedule.technicianId === schedule2.technicianId;
+                const equipmentConflict = schedule.equipmentId === schedule2.equipmentId;
+
+                if(overlap && (techConflict || equipmentConflict)){
+                    this.conflicts += 1;
+                }
+            }
+        }
+    }
+
+    /**
      * Calcul le temps qu'a pris le planning en minutes
      * @param scheduleTab Tableau du planning
      */
