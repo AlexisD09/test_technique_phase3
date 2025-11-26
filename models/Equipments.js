@@ -1,11 +1,15 @@
 const functions = require("../timeFunctions");
 
 class Equipments {
-    constructor(id, name, type, available) {
+    constructor(id, name, type, compatibleTypes, capacity, maintenanceWindow, cleaningTime) {
         this.id = id;
         this.name = name;
         this.type = type;
-        this.available = available;
+        this.compatibleTypes = compatibleTypes;
+        this.capacity = capacity;
+        this.available = true;
+        this.maintenanceWindow = maintenanceWindow;
+        this.cleaningTime = cleaningTime;
         this.bookings = [];
 
         this.functions = require('../timeFunctions.js');
@@ -22,6 +26,13 @@ class Equipments {
         if(this.bookings.length === 0) return arrivalTime;
 
         let start = this.functions.parseTimeInMinute(arrivalTime);
+        const maintenanceWindow = this.functions.splitTimeSlot(this.maintenanceWindow);
+        const maintenanceWindowStartMinutes = this.functions.parseTimeInMinute(maintenanceWindow.timeStart);
+        const maintenanceWindowEndMinutes = this.functions.parseTimeInMinute(maintenanceWindow.timeEnd);
+
+        if (start > maintenanceWindowStartMinutes && start < maintenanceWindowEndMinutes) {
+            start = maintenanceWindowEndMinutes;
+        }
 
         for (const b of this.bookings) {
             const bookingStart = this.functions.parseTimeInMinute(b.startTime);
@@ -29,6 +40,8 @@ class Equipments {
 
             if (start + durationMinutes <= bookingStart) {
                 break;
+            } else if (start + durationMinutes > maintenanceWindowStartMinutes) {
+                start = maintenanceWindowEndMinutes;
             } else {
                 start = bookingEnd;
             }

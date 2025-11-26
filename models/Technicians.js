@@ -22,9 +22,9 @@ class Technicians {
     getNextAvailableTime(arrivalTime, durationMinutes) {
         if(this.bookings.length === 0) return arrivalTime;
 
-        const lunchBreakTime = this.functions.splitLunchBreakTime(this.lunchBreak);
-        const lunchStartMinutes = this.functions.parseTimeInMinute(lunchBreakTime.lunchStart);
-        const lunchEndMinutes = this.functions.parseTimeInMinute(lunchBreakTime.lunchEnd);
+        const lunchBreakTime = this.functions.splitTimeSlot(this.lunchBreak);
+        const lunchStartMinutes = this.functions.parseTimeInMinute(lunchBreakTime.timeStart);
+        const lunchEndMinutes = this.functions.parseTimeInMinute(lunchBreakTime.timeEnd);
 
         let start = this.functions.parseTimeInMinute(arrivalTime);
 
@@ -70,6 +70,7 @@ class Technicians {
         for(let technician of technicians) {
             let firstSpeciality = technician.speciality[0];
             let secondSpeciality = null;
+            let durationMinutesCache = Math.round(durationMinutes/technician.efficiency);
 
             if(technician.speciality.length > 1){
                 secondSpeciality = technician.speciality[1]
@@ -77,7 +78,7 @@ class Technicians {
 
             if(firstSpeciality !== sampleType && secondSpeciality !== sampleType) continue;
 
-            const nextAvailableTime = technician.getNextAvailableTime(arrivalTime, durationMinutes);
+            const nextAvailableTime = technician.getNextAvailableTime(arrivalTime, durationMinutesCache);
             if(nextAvailableTime === null) break;
 
             const nextAvailableTimeMinutes = functions.parseTimeInMinute(nextAvailableTime);

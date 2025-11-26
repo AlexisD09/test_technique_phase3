@@ -101,14 +101,49 @@
   ],
   "equipment": [
     {
-      "id": "E001",
+      "id": "EQ001",
+      "name": "Analyseur Hématologie XN-3000",
       "type": "BLOOD",
-      "available": true
+      "compatibleTypes": ["Hémogramme", "Numération", "Coagulation", "Frottis"],
+      "capacity": 2,
+      "maintenanceWindow": "06:00-07:00",
+      "cleaningTime": 10
     },
     {
-      "id": "E002",
+      "id": "EQ002",
+      "name": "Automate Biochimie Cobas 8000",
+      "type": "CHEMISTRY",
+      "compatibleTypes": ["Bilan hépatique", "Lipides", "Électrolytes", "Troponine", "HbA1c"],
+      "capacity": 3,
+      "maintenanceWindow": "06:30-07:30",
+      "cleaningTime": 15
+    },
+    {
+      "id": "EQ003",
+      "name": "Station Microbiologie Vitek MS",
+      "type": "MICROBIOLOGY",
+      "compatibleTypes": ["ECBU", "Hémoculture", "Parasitologie", "Prélèvement gorge"],
+      "capacity": 2,
+      "maintenanceWindow": "07:00-08:00",
+      "cleaningTime": 20
+    },
+    {
+      "id": "EQ004",
+      "name": "Système Immunologie Liaison XL",
       "type": "IMMUNOLOGY",
-      "available": true
+      "compatibleTypes": ["Sérologie", "Allergènes", "Vaccination", "Titre anticorps"],
+      "capacity": 2,
+      "maintenanceWindow": "05:30-06:30",
+      "cleaningTime": 12
+    },
+    {
+      "id": "EQ005",
+      "name": "Séquenceur Génétique NextSeq",
+      "type": "GENETICS",
+      "compatibleTypes": ["Caryotype", "Conseil génétique", "Pharmacogénétique"],
+      "capacity": 1,
+      "maintenanceWindow": "19:00-20:00",
+      "cleaningTime": 30
     }
   ]
 }

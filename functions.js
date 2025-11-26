@@ -40,6 +40,10 @@ function extractDataFromJson() {
             equipment.id,
             equipment.name,
             equipment.type,
+            equipment.compatibleTypes,
+            equipment.capacity,
+            equipment.maintenanceWindow,
+            equipment.cleaningTime,
             equipment.available
         )
     })

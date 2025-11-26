@@ -19,9 +19,12 @@ function planifyLab(data){
     for(const sample of samples) {
         const sampleType = sample.type;
         const sampleArrivalTime = sample.arrivalTime;
-        const sampleDuration = sample.analysisTime;
+        let sampleDuration = sample.analysisTime;
 
         const { technician: assignedTechnician, startTime: startTimeTechnician } = Technicians.getNextAvailableTechnician(technicians, sampleType, sampleArrivalTime, sampleDuration);
+
+        sampleDuration = Math.round(sampleDuration/assignedTechnician.efficiency);
+
         const { equipment: assignedEquipment, startTime: startTimeEquipment } = Equipments.getNextAvailableEquipment(equipments, sampleType, sampleArrivalTime, sampleDuration);
 
         const startTime = startTimeTechnician > startTimeEquipment ? startTimeTechnician : startTimeEquipment;

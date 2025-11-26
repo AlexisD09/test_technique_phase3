@@ -39,17 +39,17 @@ function formatTime(minutes){
 }
 
 /**
- * Récupère l'heure de début et de fin de la pause déjeuner
- * @param lunchBreakTime horaire de pause d'un technicien format "HH:MM-HH:MM"
- * @returns {{lunchStart: number, lunchEnd: number}}
+ * Sépare les deux horaires d'une tranche horaire
+ * @param timeSlot horaire format "HH:MM-HH:MM"
+ * @returns {{timeStart: number, timeEnd: number}}
  */
-function splitLunchBreakTime(lunchBreakTime) {
-    const [lunchStart, lunchEnd] = lunchBreakTime.split('-');
+function splitTimeSlot(timeSlot) {
+    const [timeStart, timeEnd] = timeSlot.split('-');
 
     return {
-        lunchStart : lunchStart,
-        lunchEnd : lunchEnd,
+        timeStart : timeStart,
+        timeEnd : timeEnd,
     };
 }
 
-module.exports = { calculateEndTime, parseTimeInMinute, formatTime, splitLunchBreakTime };
+module.exports = { calculateEndTime, parseTimeInMinute, formatTime, splitTimeSlot };
