@@ -22,12 +22,18 @@ class Technicians {
 
         let start = this.functions.parseTimeInMinute(arrivalTime);
 
+        if (start < this.startTime) {
+            start = this.startTime;
+        }
+
         for (const booking of this.bookings) {
             const bookingStart = this.functions.parseTimeInMinute(booking.startTime);
             const bookingEnd = this.functions.parseTimeInMinute(booking.endTime);
 
             if (start + durationMinutes <= bookingStart) {
                 break;
+            } else if(start + durationMinutes > this.endTime) {
+                return null;
             } else {
                 start = bookingEnd;
             }
@@ -53,7 +59,10 @@ class Technicians {
         for(let technician of technicians) {
             if(technician.speciality !== sampleType && technician.speciality !== 'GENERAL') continue;
 
-            const nextAvailableTimeMinutes = functions.parseTimeInMinute(technician.getNextAvailableTime(arrivalTime, durationMinutes));
+            const nextAvailableTime = technician.getNextAvailableTime(arrivalTime, durationMinutes);
+            if(nextAvailableTime === null) break;
+
+            const nextAvailableTimeMinutes = functions.parseTimeInMinute(nextAvailableTime);
 
             if(bestAvailableTimeMinutes > nextAvailableTimeMinutes) {
                 bestAvailableTimeMinutes = nextAvailableTimeMinutes;
