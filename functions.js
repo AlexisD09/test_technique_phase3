@@ -28,8 +28,10 @@ function extractDataFromJson() {
             technician.id,
             technician.name,
             technician.speciality,
+            technician.efficiency,
             technician.startTime,
-            technician.endTime
+            technician.endTime,
+            technician.lunchBreak
         )
     })
 

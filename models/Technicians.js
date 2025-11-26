@@ -1,11 +1,13 @@
 class Technicians {
-    constructor(id, name, speciality, startTime, endTime){
+    constructor(id, name, speciality, efficiency, startTime, endTime, lunchBreak){
         this.id = id;
         this.name = name;
         this.speciality = speciality;
+        this.efficiency = efficiency;
         this.startTime = startTime;
         this.endTime = endTime;
         this.bookings = [];
+        this.lunchBreak = lunchBreak;
 
         this.functions = require('../timeFunctions.js');
     }
@@ -20,10 +22,17 @@ class Technicians {
     getNextAvailableTime(arrivalTime, durationMinutes) {
         if(this.bookings.length === 0) return arrivalTime;
 
+        const lunchBreakTime = this.functions.splitLunchBreakTime(this.lunchBreak);
+        const lunchStartMinutes = this.functions.parseTimeInMinute(lunchBreakTime.lunchStart);
+        const lunchEndMinutes = this.functions.parseTimeInMinute(lunchBreakTime.lunchEnd);
+
         let start = this.functions.parseTimeInMinute(arrivalTime);
 
         if (start < this.startTime) {
             start = this.startTime;
+        }
+        if (start > lunchStartMinutes && start < lunchEndMinutes) {
+            start = lunchEndMinutes;
         }
 
         for (const booking of this.bookings) {
@@ -34,6 +43,8 @@ class Technicians {
                 break;
             } else if(start + durationMinutes > this.endTime) {
                 return null;
+            } else if(start + durationMinutes > lunchStartMinutes) {
+                start = lunchEndMinutes;
             } else {
                 start = bookingEnd;
             }
@@ -57,7 +68,14 @@ class Technicians {
         let bestAvailableTimeMinutes = Infinity;
 
         for(let technician of technicians) {
-            if(technician.speciality !== sampleType && technician.speciality !== 'GENERAL') continue;
+            let firstSpeciality = technician.speciality[0];
+            let secondSpeciality = null;
+
+            if(technician.speciality.length > 1){
+                secondSpeciality = technician.speciality[1]
+            }
+
+            if(firstSpeciality !== sampleType && secondSpeciality !== sampleType) continue;
 
             const nextAvailableTime = technician.getNextAvailableTime(arrivalTime, durationMinutes);
             if(nextAvailableTime === null) break;

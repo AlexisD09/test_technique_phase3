@@ -38,4 +38,18 @@ function formatTime(minutes){
     return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
 }
 
-module.exports = { calculateEndTime, parseTimeInMinute, formatTime };
+/**
+ * Récupère l'heure de début et de fin de la pause déjeuner
+ * @param lunchBreakTime horaire de pause d'un technicien format "HH:MM-HH:MM"
+ * @returns {{lunchStart: number, lunchEnd: number}}
+ */
+function splitLunchBreakTime(lunchBreakTime) {
+    const [lunchStart, lunchEnd] = lunchBreakTime.split('-');
+
+    return {
+        lunchStart : lunchStart,
+        lunchEnd : lunchEnd,
+    };
+}
+
+module.exports = { calculateEndTime, parseTimeInMinute, formatTime, splitLunchBreakTime };
